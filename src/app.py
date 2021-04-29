@@ -25,6 +25,8 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+
+# Get All Family Members
 @app.route('/members', methods=['GET'])
 def get_all_members():
     status = 200
@@ -41,9 +43,36 @@ def get_all_members():
         }
         status = 500
 
-    return jsonify(response_body), 200
+    return jsonify(response_body), status
 
-@app.route('/members', methods=['POST'])
+    
+# Get one family member
+@app.route('/member/<int:id>', methods=['GET'])
+def get_member(id):
+    status = 200
+    # this is how you can use the Family datastructure by calling its methods
+    try:
+        member = jackson_family.get_member(id)
+        response_body = member
+
+        if member == False:
+            response_body = {
+                "message": "Member not found."
+            }
+            status = 404
+    except:
+        # RESPONSE (content_type: application/json):
+
+        # status_code: 200 if success. 400 if bad request (wrong info) screw up, 500 if the server encounter an error
+        response_body = {
+            "message": "Problem with the server. Could not fulfill request."
+        }
+        status = 500
+
+    return jsonify(response_body), status
+
+# Add a new member
+@app.route('/member', methods=['POST'])
 def add_member():
     status = 200
     body = request.json
@@ -65,6 +94,7 @@ def add_member():
 
     return jsonify(response_body), status
 
+# Delete member
 @app.route('/member/<int:id>', methods=['DELETE'])
 def delete_member(id):
     status = 200
